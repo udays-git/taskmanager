@@ -10,32 +10,38 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tasks")
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 public class Tasks {
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "title",nullable = false)
+
     private String title;
-    @Column(name = "description",nullable = false)
     private String description;
-    @Column(name = "status",nullable = false)
+
     private String status;
-    @Column(name = "dueDate",nullable = false)
+
     private LocalDate dueDate;
-
-    @Column(name = "priority",nullable = false)
     private Integer priority;
-    @Column(name = "createdAt", updatable = false)
-    private LocalDateTime createdAt;
 
-    @Column(name = "updatedAt")
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = createdAt;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

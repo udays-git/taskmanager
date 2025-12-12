@@ -1,81 +1,76 @@
 package com.taskmanager.controller;
 
-
+import com.taskmanager.dto.ProjectDTO;
 import com.taskmanager.dto.ResponseDTO;
 import com.taskmanager.dto.TasksDTO;
-import com.taskmanager.dto.UserDTO;
-import com.taskmanager.exception.TMSException;
 import com.taskmanager.service.TMSService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
-@RequestMapping("/TMS")
-@CrossOrigin
+@RequestMapping("/api")
 public class TMSController {
 
     @Autowired
-    public TMSService tmsService;
+    private TMSService tmsService;
 
-    @PostMapping(value = "add-user-and-projects")
-    public ResponseEntity<ResponseDTO> addUserAndProjects(@RequestBody UserDTO userDTO) throws TMSException {
-        ResponseDTO responseDTO = tmsService.addUserAndProjects(userDTO);
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    @GetMapping("/projects")
+    public ResponseEntity<List<ProjectDTO>> listProjects(@RequestParam Long userId) {
+        return ResponseEntity.ok(tmsService.getProjectsByUserId(userId));
     }
 
-    @PostMapping(value = "/add-tasks/{title}")
-    public ResponseEntity<ResponseDTO> addTasks(@PathVariable  String title, @RequestBody TasksDTO tasksDTO) throws TMSException {
-        ResponseDTO responseDTO = tmsService.addTasksForProject(title,tasksDTO);
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    @PostMapping("/projects")
+    public ResponseEntity<ResponseDTO> createProject(@RequestBody ProjectDTO projectDTO) {
+        return ResponseEntity.ok(tmsService.createProjectForExistingUser(projectDTO));
     }
 
-    @GetMapping(value ="/fetchProjectDetailsAndTasks/{title}" )
-    public ResponseEntity<List<TasksDTO>> fetchProjectDetailsAndTasks(@PathVariable  String title) throws TMSException {
-
-        List<TasksDTO> tasksdto = tmsService.fetchProjectsAndTasks(title);
-        return new ResponseEntity<>(tasksdto, HttpStatus.OK);
+    @PostMapping("/projects/{projectId}/tasks")
+    public ResponseEntity<ResponseDTO> addTask(@PathVariable Long projectId,
+                                               @RequestParam Long userId,
+                                               @RequestBody TasksDTO task) {
+        return ResponseEntity.ok(tmsService.addTaskToProjectForUser(projectId, userId, task));
     }
 
-    @DeleteMapping(value = "/delete-project/{title}")
-    public ResponseEntity<ResponseDTO> deleteProjectAndAssociatedTasks(@PathVariable String title) throws TMSException {
-        ResponseDTO responseDTO = tmsService.deleteProjectAndAssociatedTasks(title);
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    @GetMapping("/projects/{projectId}/tasks")
+    public ResponseEntity<List<TasksDTO>> getProjectTasks(@PathVariable Long projectId,
+                                                          @RequestParam Long userId) {
+        return ResponseEntity.ok(tmsService.fetchTasksForProjectAndUser(projectId, userId));
     }
-    @DeleteMapping("/{id}")
+
+    @DeleteMapping("/projects/{projectId}")
+    public ResponseEntity<ResponseDTO> deleteProject(@PathVariable Long projectId,
+                                                     @RequestParam Long userId) {
+        return ResponseEntity.ok(tmsService.deleteProjectAndAssociatedTasksForUser(projectId, userId));
+    }
+
+    @GetMapping("/tasks/{id}")
+    public ResponseEntity<TasksDTO> getTask(@PathVariable Long id) {
+        return ResponseEntity.ok(tmsService.fetchTaskById(id));
+    }
+
+    @PutMapping("/tasks/{id}")
+    public ResponseEntity<ResponseDTO> updateTask(@PathVariable Long id,
+                                                  @RequestBody TasksDTO task) {
+        return ResponseEntity.ok(tmsService.updateTask(task, id));
+    }
+
+    @PatchMapping("/tasks/{id}")
+    public ResponseEntity<ResponseDTO> partialUpdateTask(@PathVariable Long id,
+                                                         @RequestBody TasksDTO task) {
+        return ResponseEntity.ok(tmsService.partialUpdateTask(id, task));
+    }
+
+    @DeleteMapping("/tasks/{id}")
     public ResponseEntity<ResponseDTO> deleteTask(@PathVariable Long id) {
-        ResponseDTO responseDto = tmsService.deleteTask(id);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return ResponseEntity.ok(tmsService.deleteTask(id));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TasksDTO> fetchTaskById(@PathVariable Long id) {
-        TasksDTO taskDto = tmsService.fetchTaskById(id);
-        return new ResponseEntity<>(taskDto, HttpStatus.OK);
+    @GetMapping("/tasks/top")
+    public ResponseEntity<List<TasksDTO>> getTopTasks(@RequestParam Long userId) {
+        return ResponseEntity.ok(tmsService.getTopFivePriorityTasksForUser(userId));
     }
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseDTO> updateTask(@RequestBody TasksDTO taskDto, @PathVariable Long id) {
-        ResponseDTO responseDto = tmsService.updateTask(taskDto, id);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<ResponseDTO> partialUpdateTask(@PathVariable Long id, @RequestBody TasksDTO partial) {
-        ResponseDTO responseDto = tmsService.partialUpdateTask(id, partial);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
-    }
-
-    @GetMapping("/top")
-    public ResponseEntity<List<TasksDTO>> getTopFive() {
-        return ResponseEntity.ok(tmsService.getTopFivePriorityTasks());
-    }
-
-
-
-
-
-
 }

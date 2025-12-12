@@ -1,30 +1,39 @@
 package com.taskmanager.entity;
 
-import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
-@Table(name = "userclient")
-@Setter
+@Table(name = "users", uniqueConstraints = {
+    @UniqueConstraint(columnNames = "name"),
+    @UniqueConstraint(columnNames = "email")
+})
 @Getter
+@Setter
 @NoArgsConstructor
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(name="name",nullable = false, unique = true)
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(name="email",nullable = false, unique = true)
+    @Column(nullable = false, length = 150)
     private String email;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name="user_id", nullable = false)
-    private List<Project> project ;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Project> projects = new ArrayList<>();
 }

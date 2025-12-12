@@ -1,15 +1,16 @@
 package com.taskmanager.repository;
 
-import com.taskmanager.entity.Project;
 import com.taskmanager.entity.Tasks;
+import com.taskmanager.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public interface TaskRepository extends JpaRepository<Tasks,Long> {
-    public List<Tasks> findByProject(Project project);
-    public List<Tasks> findTop5ByOrderByPriorityDesc();
-}
+public interface TaskRepository extends JpaRepository<Tasks, Long> {
 
+    List<Tasks> findByProject(Project project);
+
+    List<Tasks> findByProject_User_Id(Long userId);
+
+    List<Tasks> findTop5ByProject_User_IdOrderByPriorityDesc(Long userId);
+}
