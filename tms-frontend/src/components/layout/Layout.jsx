@@ -11,7 +11,6 @@ function Layout({ children }) {
       </main>
       <footer className="footer">
         <div className="container">
-          <p>Task Management System © 2024</p>
         </div>
       </footer>
     </div>

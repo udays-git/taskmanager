@@ -31,12 +31,10 @@ function TaskList() {
     setError('');
     
     try {
-      // Load project details
       const projectsRes = await ProjectService.getAll(user.id);
       const currentProject = projectsRes.data.find(p => p.id.toString() === projectId);
       setProject(currentProject || null);
       
-      // Load tasks for this project
       const tasksRes = await ProjectService.getTasks(projectId, user.id);
       const tasksWithNumericPriority = tasksRes.data.map(task => ({
         ...task,
