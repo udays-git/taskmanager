@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ProjectService from '../../services/projectService';
 import ProjectForm from './ProjectForm';
 import ProjectCard from './ProjectCard';
-import { useAuth } from '../../context/authContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Dashboard() {
   const { user, logout, loading } = useAuth();
@@ -20,7 +20,6 @@ export default function Dashboard() {
     } else {
       load();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, loading]);
 
   async function load() {
